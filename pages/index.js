@@ -1,11 +1,12 @@
+import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import AppLayout from '../layouts';
 
-export default function Home({ onChangeTab }) {
+export default function Home() {
+  const router = useRouter();
+
   useEffect(() => {
-    if (typeof onChangeTab === 'function') {
-      onChangeTab('Dashboard');
-    }
+    router.replace('/dashboard');
   }, []);
 
   return null;

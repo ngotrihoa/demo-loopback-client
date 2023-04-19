@@ -1,3 +1,4 @@
+import useAuthService from '@/common/hooks/useAuthService';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Layout, Menu } from 'antd';
 import { useRouter } from 'next/router';
@@ -9,6 +10,7 @@ const { Header, Sider, Content } = Layout;
 const SideBar = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [tabActived, setTabActived] = useState(null);
+  const { authData } = useAuthService();
 
   const flatRouter = useMemo(
     () =>

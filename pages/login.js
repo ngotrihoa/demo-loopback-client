@@ -1,18 +1,44 @@
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Checkbox, Form, Input, message } from 'antd';
 import styles from '../styles/login.module.css';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
+import useAuthService from '@/common/hooks/useAuthService';
+import utils from '@/common/utils';
+import { useRouter } from 'next/router';
 
 const Login = () => {
-  const onFinish = (values) => {
-    console.log('Success:', values);
+  const [messageApi, contextHolder] = message.useMessage();
+  const router = useRouter();
+  const { authData, checkLogin, setAuthData, authService } = useAuthService();
+  console.log('🚀  authData:', authData);
+  const isLogin = checkLogin();
+
+  const onFinish = async (values) => {
+    const [data, error] = await authService.login(values);
+    if (data) {
+      messageApi.open({
+        type: 'success',
+        content: 'Login successfully!',
+      });
+
+      router.replace('/dashboard');
+    }
+
+    if (error) {
+      messageApi.open({
+        type: 'error',
+        content: `Login fail! Error: ${error.message}`,
+      });
+    }
   };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
+  useEffect(() => {
+    isLogin && router.replace('/dashboard');
+  }, [isLogin]);
+
   return (
     <div className={styles.loginContainer}>
+      {contextHolder}
       <div className={styles.formContainer}>
         <h2 className={styles.formHeader}>Login</h2>
         <div className={styles.form}>
@@ -20,7 +46,6 @@ const Login = () => {
             name="basic"
             // initialValues={{ remember: true }}
             onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
             autoComplete="off"
             layout="vertical"
           >
@@ -41,7 +66,7 @@ const Login = () => {
             </Form.Item>
 
             <Form.Item>
-              <Button type="primary" htmlType="submit" block>
+              <Button type="primary" htmlType="submit" block loading={authData.isLoading}>
                 Login
               </Button>
               Or <Link href={'/register'}> Register now!</Link>
